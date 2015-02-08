@@ -25,12 +25,15 @@ public class Quote {
 	private double high;
 
 	private double low;
+	
+	private double adjClose;
 
-	public Quote(String open, String high, String low, String close) throws NumberFormatException {
+	public Quote(String open, String high, String low, String close, String adjClose) throws NumberFormatException {
 			this.open = Double.valueOf(open);
 			this.high = Double.valueOf(high);
 			this.low = Double.valueOf(low);
 			this.close = Double.valueOf(close);
+			this.adjClose = Double.valueOf(adjClose);
 	}
 
 	public double getClose() {
@@ -63,6 +66,10 @@ public class Quote {
 
 	public void setOpen(double open) {
 		this.open = open;
+	}
+
+	public double getAdjClose() {
+		return adjClose;
 	}
 
 }

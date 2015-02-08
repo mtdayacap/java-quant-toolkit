@@ -5,10 +5,13 @@ import static org.quant.toolkit.entity.Quote.HIGH;
 import static org.quant.toolkit.entity.Quote.LOW;
 import static org.quant.toolkit.entity.Quote.OPEN;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.jblas.DoubleMatrix;
+import org.jdaf.DoubleDataFrame;
 import org.quant.toolkit.entity.StockQuotes;
 import org.quant.toolkit.exceptions.StockQuotesUtilException;
 
@@ -79,6 +82,36 @@ public class StockQuotesUtil {
 		}
 
 		return prices;
+	}
+
+	public static DoubleDataFrame<Date> toDoubleDataFrame(
+			List<StockQuotes> stockQuotesList, String price)
+			throws StockQuotesUtilException {
+		if (CollectionUtils.isEmpty(stockQuotesList)) {
+			return null;
+		}
+		// Validate number of rows are equal
+		StockQuotes sq = stockQuotesList.get(0);
+		int rows = sq.getDates().size();
+		for (int i = 1; i < stockQuotesList.size(); i++) {
+			StockQuotes q = stockQuotesList.get(i);
+			if (q.getDates().size() != rows) {
+				throw new StockQuotesUtilException(
+						"Stock quotes not equal in size");
+			}
+		}
+
+		// Construct DoubleDataFrame
+		List<Date> indexes = sq.getDates();
+		DoubleMatrix prices = toQuoteDoubleMatrix(stockQuotesList, price);
+		List<String> labels = new ArrayList<String>();
+		for (StockQuotes stockQuotes : stockQuotesList) {
+			String symbol = stockQuotes.getSymbol();
+			labels.add(symbol);
+		}
+		DoubleDataFrame<Date> df = new DoubleDataFrame<Date>(indexes, prices,
+				labels);
+		return df;
 	}
 
 }

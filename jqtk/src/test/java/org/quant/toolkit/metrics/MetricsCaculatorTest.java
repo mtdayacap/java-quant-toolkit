@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.jblas.DoubleMatrix;
+import org.jdaf.DoubleDataFrame;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.quant.toolkit.DoubleMatrixUtil;
+import org.quant.toolkit.StockQuotesUtil;
 import org.quant.toolkit.dao.DAO;
 import org.quant.toolkit.dao.YahooDAO;
 import org.quant.toolkit.entity.Quote;
@@ -21,7 +23,7 @@ import org.quant.toolkit.entity.StockQuotes;
 import org.quant.toolkit.entity.StockReturns;
 import org.quant.toolkit.exceptions.MetricsCalculatorException;
 import org.quant.toolkit.exceptions.StockQuotesUtilException;
-import org.quant.toolkit.metrics.MetricsCalculator;
+import org.quant.toolkit.riskreward.MetricsCalculator;
 
 public class MetricsCaculatorTest {
 
@@ -48,10 +50,11 @@ public class MetricsCaculatorTest {
 		System.out.println("m: " + m);
 		System.out.println("sm: " + sm);
 		System.out.println("rets: " + rets);
-		
+
 	}
 
-	public void testReturnizeAAPLClosingPrices() throws NumberFormatException,
+	@Test
+	public void testReturnizeAAPLXOMClosingPrices() throws NumberFormatException,
 			UnsupportedEncodingException, IOException, ParseException,
 			InterruptedException, ExecutionException, StockQuotesUtilException,
 			MetricsCalculatorException {
@@ -70,19 +73,30 @@ public class MetricsCaculatorTest {
 				fromMonth, fromDay, toYear, toMonth, toDay,
 				YahooDAO.INTERVAL_PLACEHOLDER, symbols);
 
+		DoubleDataFrame<Date> closingPricesDf = StockQuotesUtil
+				.toDoubleDataFrame(stockQuotesList, Quote.CLOSE);
+
 		MetricsCalculator mc = new MetricsCalculator();
-		List<StockReturns> stockReturnList = mc.returnize0(stockQuotesList,
-				Quote.CLOSE);
-		StockReturns sr = null;
-		for (StockReturns stockReturns : stockReturnList) {
-			if ("AAPL".equals(stockReturns.getSymbol())) {
-				sr = stockReturns;
-				break;
-			}
-		}
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		Date date = df.parse("2008-01-16");
-		double retVal = sr.get(date);
-		System.out.println("EXP = -0.055608365019 : ACT = " + retVal);
+		DoubleMatrix retsDm = mc.returnize0(closingPricesDf.getValues());
+		DoubleDataFrame<Date> retsDf = new DoubleDataFrame<Date>(
+				closingPricesDf.getIndexes(), retsDm,
+				closingPricesDf.getLabels());
+		
+		
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		// Date,AAPL,XOM
+		// 2009-12-15 16:00:00,-0.0142654076556,-0.00746161572679
+		Date date1 = sdf.parse("2009-12-15");
+		// 2008-01-18 16:00:00,0.00292125054385,0.0139435109045
+		Date date2 = sdf.parse("2008-01-18");
+
+		double aaplRet1 = retsDf.get(date1, "AAPL");
+		double xomRet1 = retsDf.get(date1, "XOM");
+		System.out.println("2009-12-15, " + aaplRet1 + ", " + xomRet1);
+
+		double aaplRet2 = retsDf.get(date2, "AAPL");
+		double xomRets2 = retsDf.get(date2, "XOM");
+		System.out.println("2008-01-18, " + aaplRet2 + ", " + xomRets2);
 	}
 }

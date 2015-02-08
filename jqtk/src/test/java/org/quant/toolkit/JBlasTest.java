@@ -130,14 +130,48 @@ public class JBlasTest {
 		System.out.println("ORIG: " + m);
 		DoubleMatrixUtil.shift(m, -2);
 		System.out.println("SHIFTED " + -2 + ": " + m);
-		
+
 		m = new DoubleMatrix(1, 3, 1.1, 2.2, 3.3);
 		System.out.println("ORIG: " + m);
 		DoubleMatrixUtil.shift(m, -2);
 		System.out.println("SHIFTED " + -2 + ": " + m);
-		
+
+	}
+
+	@Test
+	public void testDoubleMatrixaMeanOps() {
+		DoubleMatrix m = new DoubleMatrix(2, 3, 1, 4, 2, 5, 3, 6);
+		System.out.println("m: " + m);
+
+		// Get the columns
+		int[] c = new int[m.columns];
+		for (int i = 0; i < m.columns; i++) {
+			c[i] = i;
+		}
+		DoubleMatrix n = m.get(0, c);
+		System.out.println("n: " + n);
+		for (int r = 1; r < m.rows; r++) {
+			DoubleMatrix l = m.get(r, c);
+			System.out.println("l: " + l);
+			n = n.addi(l);
+			System.out.println("n: " + n);
+		}
+		n.divi(m.rows);
+		System.out.println("ave n: " + n);
 	}
 	
-	
-
+	@Test
+	public void testPutRowOrColumnOps(){
+		DoubleMatrix m = new DoubleMatrix(3,3);
+		System.out.println("m: " + m);
+		DoubleMatrix v = DoubleMatrix.ones(3, 1);
+		System.out.println("v: " + v);
+		m.putColumn(0, v);
+		System.out.println("Put Col m: " + m);
+		
+		m = DoubleMatrix.zeros(3, 3);
+		v = DoubleMatrix.ones(1, 3);
+		m.putRow(0, v);
+		System.out.println("Put Row m: " + m);
+	}
 }

@@ -12,6 +12,7 @@
 		<commons.collections.version>3.2.1</commons.collections.version>
 		<commons.csv.version>1.1</commons.csv.version>
 		<junit.version>4.11</junit.version>
+		<jdaf.version>0.0.1-SNAPSHOT</jdaf.version>
 	</properties>
 
 	<dependencies>
@@ -34,6 +35,12 @@
 			<version>${jblas.version}</version>
 		</dependency>
 
+		<dependency>
+		    <groupId>org.jdaf</groupId>
+		    <artifactId>jdaf</artifactId>
+		    <version>${jdaf.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>

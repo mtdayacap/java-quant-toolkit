@@ -99,7 +99,7 @@ public class YahooDAO implements DAO {
 				}
 				Quote quote = new Quote(record.get(OPEN),
 						record.get(HIGH), record.get(LOW),
-						record.get(CLOSE));
+						record.get(CLOSE), record.get(ADJ_CLOSE));
 				Date date = df.parse(record.get(DATE));
 				stockQuotes.add(date, quote);
 			}
