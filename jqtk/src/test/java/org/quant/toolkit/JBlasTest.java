@@ -174,4 +174,14 @@ public class JBlasTest {
 		m.putRow(0, v);
 		System.out.println("Put Row m: " + m);
 	}
+	
+	@Test
+	public void testResizeOfDoubleMatrix(){
+		// Along the X-axis
+		DoubleMatrix m = new DoubleMatrix(1,3, 1, 2, 3);
+		System.out.println("m:"+m);
+		DoubleMatrix ones = DoubleMatrix.ones(3, 3);
+		DoubleMatrix resize = ones.mulRowVector(m);
+		System.out.println("ones:"+resize);
+	}
 }

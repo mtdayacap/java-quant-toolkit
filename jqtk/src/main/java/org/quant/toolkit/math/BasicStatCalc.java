@@ -1,20 +1,23 @@
 package org.quant.toolkit.math;
 
+import static org.jblas.MatrixFunctions.powi;
+import static org.jblas.MatrixFunctions.sqrt;
+
 import org.jblas.DoubleMatrix;
 
-public class BasicMathCalc {
+public class BasicStatCalc {
 
-	private static final int X = 0;
+	public static final String X = "X";
 
-	private static final int Y = 1;
+	public static final String Y = "Y";
 
-	public DoubleMatrix cumProd(DoubleMatrix m, int axis) {
-		if (empty(m)) {
+	public DoubleMatrix cumProd(DoubleMatrix m, String axis) {
+		if (notValidParams(m, axis)) {
 			return null;
 		}
 
 		DoubleMatrix n = new DoubleMatrix(m.rows, m.columns);
-		if (axis == X) {
+		if (X.equals(axis)) {
 			// Init
 			n.putRow(0, m.getRow(0));
 			for (int i = 1; i < m.rows; i++) {
@@ -38,17 +41,13 @@ public class BasicMathCalc {
 		return n;
 	}
 
-	private boolean empty(DoubleMatrix m) {
-		return (m == null || m.length == 0);
-	}
-
-	public DoubleMatrix mean(DoubleMatrix m, int axis) {
-		if (empty(m)) {
+	public DoubleMatrix mean(DoubleMatrix m, String axis) {
+		if (notValidParams(m, axis)) {
 			return null;
 		}
 
 		// Get mean along the X-axis
-		if (axis == X) {
+		if (X.equals(axis)) {
 			// Get all columns indexes
 			int axisLength = m.columns;
 			int numOfValues = m.rows;
@@ -56,16 +55,46 @@ public class BasicMathCalc {
 			return mean(m, cols, axisLength, axis, numOfValues);
 		}
 		// Get mean along the Y-axis
-		else if (axis == Y) {
+		else {
 			// Get all rows indexes
 			int axisLength = m.rows;
 			int numOfValues = m.columns;
 			int[] rows = getIndexes(axisLength);
-			return mean(m, rows, axisLength, axisLength, numOfValues)
+			return mean(m, rows, axisLength, axis, numOfValues)
 					.transpose();
 		}
+	}
 
-		return null;
+	public DoubleMatrix std(DoubleMatrix m, String axis) {
+		if (notValidParams(m, axis) || !notValidVector(m)) {
+			return null;
+		}
+		return sqrt(mean(
+				powi(m.subi(createMeanMatrixByAxis(mean(m, axis), m.rows,
+						m.columns, axis)), 2), axis));
+	}
+
+	public double stdv(DoubleMatrix v) {
+		if (notValidVector(v)) {
+			return 0;
+		}
+		return Math.sqrt(powi(v.subi(v.mean()), 2).mean());
+	}
+
+	private DoubleMatrix createMeanMatrixByAxis(DoubleMatrix meanVector,
+			int rows, int cols, String axis) {
+		DoubleMatrix meanM = null;
+		DoubleMatrix ones = DoubleMatrix.ones(rows, cols);
+		if (X.equals(axis)) {
+			meanM = ones.mulRowVector(meanVector);
+		} else {
+			meanM = ones.mulColumnVector(meanVector);
+		}
+		return meanM;
+	}
+
+	private boolean empty(DoubleMatrix m) {
+		return (m == null || m.length == 0);
 	}
 
 	private int[] getIndexes(int axisLength) {
@@ -77,10 +106,10 @@ public class BasicMathCalc {
 	}
 
 	private DoubleMatrix getValuesByAxis(DoubleMatrix m, int[] indexes, int i,
-			int axis) {
+			String axis) {
 		DoubleMatrix vals = null;
 
-		if (axis == X) {
+		if (X.equals(axis)) {
 			vals = m.get(i, indexes);
 		} else {
 			vals = m.get(indexes, i);
@@ -89,9 +118,9 @@ public class BasicMathCalc {
 	}
 
 	private DoubleMatrix mean(DoubleMatrix m, int[] indexes, int axisLength,
-			int axis, int numOfValues) {
+			String axis, int numOfValues) {
 		DoubleMatrix mean = null;
-		if (axis == X) {
+		if (X.equals(axis)) {
 			mean = m.get(0, indexes);
 		} else {
 			mean = m.get(indexes, 0);
@@ -106,4 +135,14 @@ public class BasicMathCalc {
 		return mean;
 	}
 
+	private boolean notValidParams(DoubleMatrix m, String axis) {
+		return empty(m) || (!X.equals(axis) && !Y.equals(axis));
+	}
+
+	private boolean notValidVector(DoubleMatrix v) {
+		if (v == null || !v.isVector() || v.isEmpty()) {
+			return true;
+		}
+		return false;
+	}
 }
