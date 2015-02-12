@@ -7,7 +7,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.jdaf.DoubleDataFrame;
 import org.quant.toolkit.entity.StockQuotes;
 
 public interface DAO {

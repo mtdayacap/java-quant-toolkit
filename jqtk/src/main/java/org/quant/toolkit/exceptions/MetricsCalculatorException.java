@@ -2,6 +2,8 @@ package org.quant.toolkit.exceptions;
 
 public class MetricsCalculatorException extends Exception {
 
+	private static final long serialVersionUID = 1L;
+
 	public MetricsCalculatorException(){
 		super();
 	}
