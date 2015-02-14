@@ -41,25 +41,21 @@ public class BasicStatFunctionsTest {
 	}
 
 	@Test
-	public void testVectorMean() {
+	public void testColumnVectorMean() {
 		DoubleMatrix v = new DoubleMatrix(3, 1, 1, 2, 3);
-		DoubleMatrix act = bsc.mean(v, X);
-
-		DoubleMatrix exp = new DoubleMatrix(1, 1, 2);
-		assertEquals(ALONG_THE_X_AXIS, exp, act);
-
-		act = bsc.mean(v, Y);
-		exp = new DoubleMatrix(1, 3, 1, 2, 3);
-		assertEquals(ALONG_THE_Y_AXIS, exp, act);
+		double act = bsc.meanv(v);
+		double exp = 2d;
+		assertEquals(exp, act, 1e-6);
 	}
 
 	@Test
-	public void testDoubleMatrixMeanEmpty() {
-		DoubleMatrix m = new DoubleMatrix();
-		DoubleMatrix result = bsc.mean(m, X);
-		assertEquals(null, result);
+	public void testRowVectorMean() {
+		DoubleMatrix v = new DoubleMatrix(new double[] { 1, 2, 3 });
+		double act = bsc.meanv(v);
+		double exp = 2d;
+		assertEquals(exp, act, 1e-6);
 	}
-
+	
 	@Test
 	public void testDoubleMatrixMeanZeros() {
 		DoubleMatrix m = new DoubleMatrix(2, 3);
@@ -78,7 +74,7 @@ public class BasicStatFunctionsTest {
 				14, 3, 6, 9, 12, 15);
 		DoubleMatrix exp = new DoubleMatrix(m.rows, m.columns, 1, 4, 28, 280,
 				3640, 2, 10, 80, 880, 12320, 3, 18, 162, 1944, 29160);
-		DoubleMatrix act = bsc.cumProdMatrix(m, X);
+		DoubleMatrix act = bsc.cumProd(m, X);
 		assertEquals(exp, act);
 	}
 
@@ -88,7 +84,7 @@ public class BasicStatFunctionsTest {
 				14, 3, 6, 9, 12, 15);
 		DoubleMatrix exp = new DoubleMatrix(m.rows, m.columns, 1, 4, 7, 10, 13,
 				2, 20, 56, 110, 182, 6, 120, 504, 1320, 2730);
-		DoubleMatrix act = bsc.cumProdMatrix(m, Y);
+		DoubleMatrix act = bsc.cumProd(m, Y);
 		assertEquals(exp, act);
 
 	}
@@ -96,7 +92,7 @@ public class BasicStatFunctionsTest {
 	@Test
 	public void testCumProdVectorAlongTheXAxis() {
 		DoubleMatrix v = new DoubleMatrix(5, 1, 1, 2, 3, 4, 5);
-		DoubleMatrix act = bsc.cumProdVector(v);
+		DoubleMatrix act = bsc.cumProdv(v);
 		DoubleMatrix exp = new DoubleMatrix(5, 1, 1, 2, 6, 24, 120);
 		assertEquals(exp, act);
 	}
@@ -104,22 +100,15 @@ public class BasicStatFunctionsTest {
 	@Test
 	public void testCumProdVectorAlongYAxis() {
 		DoubleMatrix v = new DoubleMatrix(5, 1, 1, 2, 3, 4, 5);
-		DoubleMatrix act = bsc.cumProdMatrix(v, Y);
+		DoubleMatrix act = bsc.cumProd(v, Y);
 		DoubleMatrix exp = v.dup();
 		assertEquals(exp, act);
 	}
 
 	@Test
-	public void testCumProdEmptyDoubleMatrix() {
-		DoubleMatrix m = new DoubleMatrix();
-		DoubleMatrix act = bsc.cumProdMatrix(m, X);
-		assertEquals(null, act);
-	}
-
-	@Test
 	public void testCumProdZerosDoubleMatrix() {
 		DoubleMatrix z = new DoubleMatrix(3, 3);
-		DoubleMatrix act = bsc.cumProdMatrix(z, X);
+		DoubleMatrix act = bsc.cumProd(z, X);
 		DoubleMatrix exp = DoubleMatrix.zeros(z.rows, z.columns);
 		assertEquals(exp, act);
 	}
@@ -154,34 +143,19 @@ public class BasicStatFunctionsTest {
 	}
 
 	@Test
-	public void testStdEmptyMatrix() {
-		DoubleMatrix e = new DoubleMatrix();
-		DoubleMatrix act = bsc.std(e, X);
-		assertEquals(null, act);
-	}
-
-	@Test
 	public void testStdZerosMatrix() {
 		DoubleMatrix z = DoubleMatrix.zeros(3, 3);
 		DoubleMatrix act = bsc.std(z, X);
 		DoubleMatrix exp = DoubleMatrix.zeros(1, 3);
 		assertEquals(exp, act);
 	}
-	
+
 	@Test
-	public void testStdScalarWithAxis(){
-		DoubleMatrix s = new DoubleMatrix(new double[]{2d});
+	public void testStdScalarWithAxis() {
+		DoubleMatrix s = new DoubleMatrix(new double[] { 2d });
 		DoubleMatrix act = bsc.std(s, Y);
 		DoubleMatrix exp = s.dup();
 		assertEquals(exp, act);
 	}
-	
-	@Test
-	public void testStdScalar(){
-		DoubleMatrix s = new DoubleMatrix(new double[]{2d});
-		double act = bsc.stdv(s);
-		double exp = 2d;
-		assertEquals(exp, act, 1e-6);
-	}
-	
+
 }

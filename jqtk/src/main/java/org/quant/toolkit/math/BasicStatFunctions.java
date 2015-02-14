@@ -11,11 +11,7 @@ public class BasicStatFunctions {
 
 	public static final String Y = "Y";
 
-	public DoubleMatrix cumProdMatrix(DoubleMatrix m, String axis) {
-		if (notValidParams(m, axis)) {
-			return null;
-		}
-
+	public DoubleMatrix cumProd(DoubleMatrix m, String axis) {
 		DoubleMatrix n = new DoubleMatrix(m.rows, m.columns);
 		if (X.equals(axis)) {
 			// Init
@@ -26,7 +22,6 @@ public class BasicStatFunctions {
 				DoubleMatrix t2 = n.getRow(i);
 				n.putRow(i, t1.mul(t2));
 			}
-
 		} else {
 			// Init
 			n.putColumn(0, m.getColumn(0));
@@ -41,19 +36,15 @@ public class BasicStatFunctions {
 		return n;
 	}
 
-	public DoubleMatrix cumProdVector(DoubleMatrix v) {
+	public DoubleMatrix cumProdv(DoubleMatrix v) {
 		if (v.isColumnVector()) {
-			return cumProdMatrix(v, X);
+			return cumProd(v, X);
 		} else {
-			return cumProdMatrix(v, Y);
+			return cumProd(v, Y);
 		}
 	}
 
 	public DoubleMatrix mean(DoubleMatrix m, String axis) {
-		if (notValidParams(m, axis)) {
-			return null;
-		}
-
 		if (X.equals(axis)) {
 			return m.columnMeans();
 		} else {
@@ -61,26 +52,17 @@ public class BasicStatFunctions {
 		}
 	}
 
-	public DoubleMatrix std(DoubleMatrix m, String axis) {
-		if (notValidParams(m, axis)) {
-			return null;
-		}
-		if (!notValidVector(m)) {
-			DoubleMatrix v = new DoubleMatrix(new double[] { stdv(m) });
-			return v;
-		}
+	public double meanv(DoubleMatrix v) {
+		return v.mean();
+	}
 
+	public DoubleMatrix std(DoubleMatrix m, String axis) {
 		return sqrt(mean(
 				powi(m.subi(createMeanMatrixByAxis(mean(m, axis), m.rows,
 						m.columns, axis)), 2), axis));
 	}
 
 	public double stdv(DoubleMatrix v) {
-		if (v.isScalar()) {
-			return v.get(0);
-		} else if (notValidVector(v)) {
-			return 0;
-		}
 		return Math.sqrt(powi(v.subi(v.mean()), 2).mean());
 	}
 
@@ -94,20 +76,5 @@ public class BasicStatFunctions {
 			meanM = ones.mulColumnVector(meanVector);
 		}
 		return meanM;
-	}
-
-	private boolean empty(DoubleMatrix m) {
-		return (m == null || m.length == 0);
-	}
-
-	private boolean notValidParams(DoubleMatrix m, String axis) {
-		return empty(m) || (!X.equals(axis) && !Y.equals(axis));
-	}
-
-	private boolean notValidVector(DoubleMatrix v) {
-		if (v == null || v.isEmpty() || !v.isVector()) {
-			return true;
-		}
-		return false;
 	}
 }
