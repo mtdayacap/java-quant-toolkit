@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.quant.toolkit</groupId>
-  <artifactId>jqtk</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.quant.toolkit</groupId>
+	<artifactId>jqtk</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
 	<properties>
 		<commons.lang3.version>3.3.2</commons.lang3.version>
 		<jblas.version>1.2.3</jblas.version>
@@ -13,16 +14,17 @@
 		<commons.csv.version>1.1</commons.csv.version>
 		<junit.version>4.11</junit.version>
 		<jdaf.version>0.0.1-SNAPSHOT</jdaf.version>
+		<jfreechart.version>1.0.19</jfreechart.version>
 	</properties>
 
 	<dependencies>
-	    
-	    <dependency>
-	        <groupId>junit</groupId>
-	        <artifactId>junit</artifactId>
-	        <version>${junit.version}</version>
-	    </dependency>
-	    
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -36,11 +38,11 @@
 		</dependency>
 
 		<dependency>
-		    <groupId>org.jdaf</groupId>
-		    <artifactId>jdaf</artifactId>
-		    <version>${jdaf.version}</version>
+			<groupId>org.jdaf</groupId>
+			<artifactId>jdaf</artifactId>
+			<version>${jdaf.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
@@ -64,6 +66,13 @@
 			<artifactId>commons-csv</artifactId>
 			<version>${commons.csv.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>${jfreechart.version}</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
@@ -78,5 +87,5 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 </project>
