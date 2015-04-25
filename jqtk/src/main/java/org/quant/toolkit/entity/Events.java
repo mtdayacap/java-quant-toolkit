@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -39,6 +40,26 @@ public class Events {
 				eventMap.get(symbol).add(date);
 			}
 		}
+	}
+
+	public void remove(String marketSymbol) {
+		eventMap.remove(marketSymbol);
+	}
+
+	public Set<String> getSymbols() {
+		return eventMap.keySet();
+	}
+
+	public List<Date> getDates(String symbol) {
+		return eventMap.get(symbol);
+	}
+
+	public boolean contains(String symbol, Date date) {
+		List<Date> events = eventMap.get(symbol);
+		if (CollectionUtils.isEmpty(events)) {
+			return false;
+		}
+		return events.contains(date);
 	}
 
 }

@@ -63,7 +63,17 @@ public class BasicStatFunctions {
 	}
 
 	public double stdv(DoubleMatrix v) {
-		return Math.sqrt(powi(v.subi(v.mean()), 2).mean());
+		int n = v.length;
+		DoubleMatrix copy = v.dup();
+		double mean = v.mean();
+		System.out.println("mean="+mean);
+		DoubleMatrix sqrdDiffs = powi(copy.subi(mean), 2);
+		System.out.println("sqrdDiffs="+sqrdDiffs);
+		double sumSqrdDiffs = sqrdDiffs.sum();
+		double meanSqrdDiffs = sumSqrdDiffs / (n - 1);
+		System.out.println("meanSqrdDiffs="+meanSqrdDiffs);
+		System.out.println("std="+Math.sqrt(meanSqrdDiffs));
+		return Math.sqrt(meanSqrdDiffs);
 	}
 
 	private DoubleMatrix createMeanMatrixByAxis(DoubleMatrix meanVector,
@@ -76,5 +86,41 @@ public class BasicStatFunctions {
 			meanM = ones.mulColumnVector(meanVector);
 		}
 		return meanM;
+	}
+
+	public DoubleMatrix rollingMean(DoubleMatrix data, int period) {
+		DoubleMatrix rollingMean = data.dup();
+		rollingMean.fill(Double.NaN);
+
+		int cols = data.columns;
+		for (int i = period; i <= data.rows; i++) {
+			int start = i - period;
+			int end = i;
+			for (int c = 0; c < cols; c++) {
+				DoubleMatrix rowSubset = data.getRowRange(start, end, c);
+				double mean = rowSubset.mean();
+				rollingMean.put(end - 1, c, mean);
+			}
+		}
+
+		return rollingMean;
+	}
+
+	public DoubleMatrix rollingStd(DoubleMatrix data, int period) {
+		DoubleMatrix rollingStd = data.dup();
+		rollingStd.fill(Double.NaN);
+
+		int cols = data.columns;
+		for (int i = period; i <= data.rows; i++) {
+			int start = i - period;
+			int end = i;
+			for (int c = 0; c < cols; c++) {
+				DoubleMatrix rowSubset = data.getRowRange(start, end, c);
+				double std = stdv(rowSubset);
+				rollingStd.put(end - 1, c, std);
+			}
+		}
+
+		return rollingStd;
 	}
 }

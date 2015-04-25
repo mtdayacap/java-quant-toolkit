@@ -1,21 +1,21 @@
 package org.quant.toolkit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.jblas.DoubleMatrix;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.quant.toolkit.StockQuotesUtil;
-import org.quant.toolkit.dao.DAO;
 import org.quant.toolkit.dao.YahooDAO;
 import org.quant.toolkit.entity.Quote;
 import org.quant.toolkit.entity.StockQuotes;
@@ -36,7 +36,7 @@ public class StockQuotesUtilTest {
 			UnsupportedEncodingException, FileNotFoundException, IOException,
 			ParseException, InterruptedException, ExecutionException,
 			StockQuotesUtilException {
-		DAO yahooDao = new YahooDAO();
+		YahooDAO yahooDao = new YahooDAO();
 		String fromYear = "2008";
 		String fromMonth = "1";
 		String fromDay = "1";
@@ -44,12 +44,20 @@ public class StockQuotesUtilTest {
 		String toMonth = "12";
 		String toDay = "31";
 
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(YahooDAO.FROM_YEAR, fromYear);
+		map.put(YahooDAO.FROM_MONTH, fromMonth);
+		map.put(YahooDAO.FROM_DAY, fromDay);
+		map.put(YahooDAO.TO_YEAR, toYear);
+		map.put(YahooDAO.TO_MONTH, toMonth);
+		map.put(YahooDAO.TO_DAY, toDay);
+		map.put(YahooDAO.INTERVAL, YahooDAO.DAILY_TRADING_PERIOD);
+
 		List<String> symbols = new ArrayList<String>();
 		symbols.add("AAPL");
 		symbols.add("XOM");
-		List<StockQuotes> stockQuotesList = yahooDao.getStockQuotes(fromYear,
-				fromMonth, fromDay, toYear, toMonth, toDay,
-				YahooDAO.INTERVAL_PLACEHOLDER, symbols);
+		List<StockQuotes> stockQuotesList = yahooDao.getStockQuotes(map,
+				symbols, yahooDao.getTradingDays(map));
 		int colsExp = stockQuotesList.size();
 		System.out.println(colsExp);
 		StockQuotes stockQuotes1 = stockQuotesList.get(0);
@@ -57,7 +65,7 @@ public class StockQuotesUtilTest {
 		assertEquals("stockQuotes sizes not equal", stockQuotes1.size,
 				stockQuotes2.size);
 		int rowsExp = stockQuotes1.size;
-		
+
 		DoubleMatrix stockQuotesMatrix = StockQuotesUtil.toQuoteDoubleMatrix(
 				stockQuotesList, Quote.CLOSE);
 		int rowsAct = stockQuotesMatrix.rows;

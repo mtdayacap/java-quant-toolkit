@@ -4,6 +4,7 @@ import static org.quant.toolkit.entity.Quote.CLOSE;
 import static org.quant.toolkit.entity.Quote.HIGH;
 import static org.quant.toolkit.entity.Quote.LOW;
 import static org.quant.toolkit.entity.Quote.OPEN;
+import static org.quant.toolkit.entity.Quote.ADJ_CLOSE;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,6 +66,9 @@ public class StockQuotesUtil {
 						prices, startIndex);
 				startIndex += rows;
 				break;
+			case ADJ_CLOSE:
+				prices = addAllPricesToArray(stockQuotes.getAdjClosePrices(), prices, startIndex);
+				break;
 			default:
 				throw new StockQuotesUtilException(
 						"Quote prices not available for " + price);
@@ -96,8 +100,9 @@ public class StockQuotesUtil {
 		for (int i = 1; i < stockQuotesList.size(); i++) {
 			StockQuotes q = stockQuotesList.get(i);
 			if (q.getDates().size() != rows) {
-				throw new StockQuotesUtilException(
-						"Stock quotes not equal in size");
+//				throw new StockQuotesUtilException(
+//						"Stock quotes not equal in size");
+				System.out.println("s="+q.getSymbol()+",r="+q.size);
 			}
 		}
 

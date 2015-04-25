@@ -20,9 +20,19 @@ public class StockQuotes {
 		size = 0;
 	}
 
-	public StockQuotes(String symbol) {
+	public StockQuotes(String symbol, List<Date> tradingDays) {
 		this();
 		this.symbol = symbol;
+		initQuotes(tradingDays);
+	}
+
+	private void initQuotes(List<Date> tradingDays) {
+		quotes = new TreeMap<Date, Quote>();
+		for (Date date : tradingDays) {
+			quotes.put(date, new Quote(Double.NaN, Double.NaN, Double.NaN,
+					Double.NaN, 0, Double.NaN));
+		}
+		size = quotes.size();
 	}
 
 	public String getSymbol() {
@@ -34,7 +44,7 @@ public class StockQuotes {
 	}
 
 	public void add(Date date, Quote quote) {
-		if(MapUtils.isEmpty(quotes) && size == 0){
+		if (MapUtils.isEmpty(quotes) && size == 0) {
 			quotes = new TreeMap<Date, Quote>();
 		}
 		quotes.put(date, quote);
@@ -86,6 +96,22 @@ public class StockQuotes {
 		List<Double> prices = new ArrayList<Double>();
 		for (Date date : quotes.keySet()) {
 			prices.add(quotes.get(date).getHigh());
+		}
+		return prices;
+	}
+
+	public void set(Date date, Quote quote) {
+		// Record only prices same as Market Index
+		// trading days
+		if (quotes.containsKey(date)) {
+			quotes.put(date, quote);
+		}
+	}
+
+	public List<Double> getAdjClosePrices() {
+		List<Double> prices = new ArrayList<Double>();
+		for (Date date : quotes.keySet()) {
+			prices.add(quotes.get(date).getAdjClose());
 		}
 		return prices;
 	}

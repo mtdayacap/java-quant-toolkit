@@ -1,12 +1,11 @@
 package org.quant.toolkit;
 
+import static org.junit.Assert.assertEquals;
+
 import org.jblas.DoubleMatrix;
-import org.jblas.ranges.Range;
-import org.jblas.ranges.RangeUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.quant.toolkit.DoubleMatrixUtil;
 
 public class JBlasTest {
 
@@ -159,29 +158,80 @@ public class JBlasTest {
 		n.divi(m.rows);
 		System.out.println("ave n: " + n);
 	}
-	
+
 	@Test
-	public void testPutRowOrColumnOps(){
-		DoubleMatrix m = new DoubleMatrix(3,3);
+	public void testPutRowOrColumnOps() {
+		DoubleMatrix m = new DoubleMatrix(3, 3);
 		System.out.println("m: " + m);
 		DoubleMatrix v = DoubleMatrix.ones(3, 1);
 		System.out.println("v: " + v);
 		m.putColumn(0, v);
 		System.out.println("Put Col m: " + m);
-		
+
 		m = DoubleMatrix.zeros(3, 3);
 		v = DoubleMatrix.ones(1, 3);
 		m.putRow(0, v);
 		System.out.println("Put Row m: " + m);
 	}
-	
+
 	@Test
-	public void testResizeOfDoubleMatrix(){
+	public void testResizeOfDoubleMatrix() {
 		// Along the X-axis
-		DoubleMatrix m = new DoubleMatrix(1,3, 1, 2, 3);
-		System.out.println("m:"+m);
-		DoubleMatrix ones = DoubleMatrix.ones(3, 3);
+		DoubleMatrix m = new DoubleMatrix(1, 3, 1, 2, 3);
+		System.out.println("m:" + m);
+		DoubleMatrix ones = DoubleMatrix.zeros(3, 3);
 		DoubleMatrix resize = ones.mulRowVector(m);
-		System.out.println("ones:"+resize);
+		System.out.println("ones:" + resize);
+	}
+
+	@Test
+	public void testRemoveColumn() {
+		DoubleMatrix m = new DoubleMatrix(new double[][] { { 1, 2, 3 },
+				{ 4, 5, 6 }, { 7, 8, 9 } });
+		System.out.println("m: " + m);
+		DoubleMatrix n = new DoubleMatrix(3, 2);
+
+		// Transfer columns to new matrix
+		int removeColIndex = 1;
+		int cols = m.columns;
+		for (int i = 0, j = 0; i < cols; i++) {
+			if (removeColIndex != i) {
+				// Skip column to be removed
+				// Copy column to new Matrix
+				DoubleMatrix vCol = m.getColumn(i);
+				n.putColumn(j, vCol);
+				j++;
+			}
+		}
+
+		DoubleMatrix o = new DoubleMatrix(new double[][] { { 1, 3 }, { 4, 6 },
+				{ 7, 9 } });
+
+		assertEquals(o, n);
+	}
+
+	@Test
+	public void testPutRowVectorValues() {
+		DoubleMatrix m = new DoubleMatrix(new double[][] { { 1, 2, 3 },
+				{ 4, 5, 6 } });
+		DoubleMatrix v = new DoubleMatrix(new double[] { 9, 9, 9 });
+
+		// Expected
+		DoubleMatrix e = new DoubleMatrix(new double[][] { { 9, 9, 9 },
+				{ 4, 5, 6 } });
+
+		m.putRow(0, v);
+		assertEquals(e, m);
+	}
+
+	@Test
+	public void testSubColumnVector() {
+		DoubleMatrix m = new DoubleMatrix(new double[][] { { 2, 1 }, { 2, 1 },
+				{ 2, 1 } });
+		DoubleMatrix exp = new DoubleMatrix(new double[][]{{ 1, 0 }, { 1, 0 },
+				{ 1, 0 } });
+		
+		DoubleMatrix act = m.subColumnVector(m.getColumn(1));
+		assertEquals(exp, act);
 	}
 }
