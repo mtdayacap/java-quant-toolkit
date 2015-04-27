@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,8 +35,9 @@ public class BollingerBandsTest {
 	@Test
 	public void testCalculateBollingerBands() throws NumberFormatException,
 			UnsupportedEncodingException, IOException, ParseException, StockQuotesUtilException {
+		String label = "AA";
 		List<String> symbols = new ArrayList<String>();
-		symbols.add("AA");
+		symbols.add(label);
 		Map<String, String> map = new HashMap<String, String>();
 		map.put(YahooDAO.FROM_YEAR, "2008");
 		map.put(YahooDAO.FROM_MONTH, "01");
@@ -57,9 +59,31 @@ public class BollingerBandsTest {
 		// Compute Bollinger Bands
 		BollingerBands bb = new BollingerBands(closingPrices);
 		bb.calculate(20);
-		DoubleDataFrame<Date> dfBollingerBands = bb.getDataFrameValues();
+		DoubleDataFrame<Date> dfBollingerBands = bb.getBollingerBands();
 		
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		
+		// Check for NaN
+		Date date1 = df.parse("2008-01-24");
+		double nan = dfBollingerBands.get(date1, label);
+		assertTrue(Double.isNaN(nan));
+		
+		// Check for bollinger band values
+		Date date2 = df.parse("2008-01-30");
+		double value2 = dfBollingerBands.get(date2, label);
+		assertEquals(0.446779059738d, value2, 1e6);
+		
+		Date date3 = df.parse("2009-12-30");
+		double value3 = dfBollingerBands.get(date3, label);
+		assertEquals(1.34010386987d, value3, 1e6);
+		
+		Date date4 = df.parse("2009-11-30");
+		double value4 = dfBollingerBands.get(date4, label);
+		assertEquals(-1.40895882875d, value4, 1e6);
+
+		System.out.println(value2);
+		System.out.println(value3);
+		System.out.println(value4);
 	}
 
 }

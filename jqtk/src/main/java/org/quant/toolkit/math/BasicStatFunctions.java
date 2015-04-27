@@ -66,13 +66,9 @@ public class BasicStatFunctions {
 		int n = v.length;
 		DoubleMatrix copy = v.dup();
 		double mean = v.mean();
-		System.out.println("mean="+mean);
 		DoubleMatrix sqrdDiffs = powi(copy.subi(mean), 2);
-		System.out.println("sqrdDiffs="+sqrdDiffs);
 		double sumSqrdDiffs = sqrdDiffs.sum();
 		double meanSqrdDiffs = sumSqrdDiffs / (n - 1);
-		System.out.println("meanSqrdDiffs="+meanSqrdDiffs);
-		System.out.println("std="+Math.sqrt(meanSqrdDiffs));
 		return Math.sqrt(meanSqrdDiffs);
 	}
 

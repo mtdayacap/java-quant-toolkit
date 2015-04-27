@@ -151,7 +151,7 @@ public class YahooDAO {
 			reader.close();
 		}
 
-		System.out.println("ctr="+ctr);
+		System.out.println("ctr=" + ctr);
 		return stockQuotes;
 	}
 
@@ -322,16 +322,24 @@ public class YahooDAO {
 		return ("00" + str).substring(str.length());
 	}
 
-	// TODO Implement caching
 	public List<Date> getTradingDays(Map<String, String> map)
 			throws UnsupportedEncodingException, IOException, ParseException {
+		boolean toCache = false;
+		List<Date> tradingDays = new ArrayList<Date>();
+		if (isCached) {
+			tradingDays = getCachedTradingDays(map);
+			toCache = tradingDays.isEmpty();
+			if(!toCache){
+				return tradingDays;
+			}
+		}
+
 		String urlStr = generateURL(map, MARKET_INDEX);
 		SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
 		URL url = new URL(urlStr);
 		Reader reader = new InputStreamReader(url.openStream(), ENCODING);
 		CSVParser parser = new CSVParser(reader,
 				CSVFormat.DEFAULT.withHeader(CSV_HEADERS));
-		List<Date> tradingDays = new ArrayList<Date>();
 		boolean skipHeader = true;
 		try {
 			for (CSVRecord record : parser) {
@@ -348,7 +356,75 @@ public class YahooDAO {
 			reader.close();
 		}
 
+		// Check if need to cache
+		if (toCache) {
+			cacheTradingDays(tradingDays, map);
+		}
+
 		return tradingDays;
+	}
+
+	private void cacheTradingDays(List<Date> tradingDays,
+			Map<String, String> map) throws IOException {
+		SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
+		File cacheDirFile = new File(cacheDir);
+		StringBuilder sb = new StringBuilder(Quote.DATE + NEW_LINE);
+		for (Date tradingDay : tradingDays) {
+			String dateStr = df.format(tradingDay);
+			sb.append(dateStr + NEW_LINE);
+		}
+
+		if (!cacheDirFile.exists()) {
+			cacheDirFile.mkdir();
+		}
+		String cachedTradingDaysFilename = getCachedTradingDaysFilename(map);
+		File cache = new File(cachedTradingDaysFilename);
+		Files.write(cache.toPath(), sb.toString().getBytes(),
+				StandardOpenOption.CREATE);
+	}
+
+	private List<Date> getCachedTradingDays(Map<String, String> map)
+			throws IOException, ParseException {
+		List<Date> tradingDays = new ArrayList<Date>();
+		SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
+		String tradingDaysFilename = getCachedTradingDaysFilename(map);
+		File tradingDaysFile = new File(tradingDaysFilename);
+		if (!tradingDaysFile.exists()) {
+			return tradingDays;
+		}
+
+		Reader reader = new InputStreamReader(new FileInputStream(
+				tradingDaysFile), ENCODING);
+		CSVParser parser = new CSVParser(reader,
+				CSVFormat.DEFAULT.withHeader(new String[] { DATE }));
+		try {
+			boolean skipHeader = true;
+			for (CSVRecord record : parser) {
+				if (skipHeader) {
+					skipHeader = false;
+					continue;
+				}
+				String dateStr = record.get(DATE);
+				Date date = df.parse(dateStr);
+				tradingDays.add(date);
+			}
+		} finally {
+			reader.close();
+			parser.close();
+		}
+
+		return tradingDays;
+	}
+
+	private String getCachedTradingDaysFilename(Map<String, String> map) {
+		return cacheDir + SystemUtils.FILE_SEPARATOR + MARKET_INDEX
+				+ UNDERSCORE + map.get(FROM_YEAR) + DASH
+				+ addLeadingZerosWidthTwo(map.get(FROM_MONTH)) + DASH
+				+ addLeadingZerosWidthTwo(map.get(FROM_DAY)) + UNDERSCORE
+				+ map.get(TO_YEAR) + DASH
+				+ addLeadingZerosWidthTwo(map.get(TO_MONTH)) + DASH
+				+ addLeadingZerosWidthTwo(map.get(TO_DAY)) + "_td.csv";
+
 	}
 
 }
