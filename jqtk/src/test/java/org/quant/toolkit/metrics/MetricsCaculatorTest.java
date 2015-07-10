@@ -29,8 +29,11 @@ import org.quant.toolkit.riskreward.MetricsCalculator;
 
 public class MetricsCaculatorTest {
 
+	private MetricsCalculator mc;
+
 	@Before
 	public void setUp() throws Exception {
+		mc = new MetricsCalculator();
 	}
 
 	@After
@@ -87,7 +90,6 @@ public class MetricsCaculatorTest {
 		DoubleDataFrame<Date> closingPricesDf = StockQuotesUtil
 				.toDoubleDataFrame(stockQuotesList, Quote.CLOSE);
 
-		MetricsCalculator mc = new MetricsCalculator();
 		DoubleMatrix retsDm = mc.returnize0(closingPricesDf.getValues());
 		DoubleDataFrame<Date> retsDf = new DoubleDataFrame<Date>(
 				closingPricesDf.getIndexes(), retsDm,
@@ -142,27 +144,68 @@ public class MetricsCaculatorTest {
 		DoubleDataFrame<Date> closingPricesDf = StockQuotesUtil
 				.toDoubleDataFrame(stockQuotesList, Quote.CLOSE);
 
-		MetricsCalculator mc = new MetricsCalculator();
 		DoubleMatrix retsDm = mc.returnize0(closingPricesDf.getValues());
 		DoubleDataFrame<Date> retsDf = new DoubleDataFrame<Date>(
 				closingPricesDf.getIndexes(), retsDm,
 				closingPricesDf.getLabels());
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		
-		//	Date,AA
-		//	2008-01-28,0.0254154447703
-		//	2008-01-29,0.037813790912
+
+		// Date,AA
+		// 2008-01-28,0.0254154447703
+		// 2008-01-29,0.037813790912
 		double val1 = retsDf.get(sdf.parse("2008-01-28"), "AA");
 		assertEquals(0.0254154447703d, val1, 1e6);
 		double val2 = retsDf.get(sdf.parse("2008-01-29"), "AA");
 		assertEquals(0.037813790912d, val2, 1e6);
-		
-		//	2009-06-23,-0.00199600798403
-		//	2009-06-24,0.021
+
+		// 2009-06-23,-0.00199600798403
+		// 2009-06-24,0.021
 		double val3 = retsDf.get(sdf.parse("2009-06-23"), "AA");
 		assertEquals(-0.00199600798403d, val3, 1e6);
 		double val4 = retsDf.get(sdf.parse("2009-06-24"), "AA");
 		assertEquals(0.021d, val4, 1e6);
+	}
+
+	@Test
+	public void testCumulativeReturn() {
+		DoubleMatrix m = new DoubleMatrix(new double[] { 3.1, 3.8, 4.0, 4.3,
+				4.1, 5.0 });
+		DoubleMatrix act = mc.cumulativeReturn(m);
+
+		DoubleMatrix exp = new DoubleMatrix(new double[] { 1.0, 1.22580645,
+				1.29032258, 1.38709677, 1.32258065, 1.61290323 });
+		assertEquals(exp, act);
+	}
+
+	@Test
+	public void testSharpeRatio() {
+		double avg = 0.000547073277579;
+		double std = 0.00716033053973;
+
+		double sharpeRatio = mc.sharpeRatio(avg, std);
+		double exp = 1.20804311656;
+
+		assertEquals(exp, sharpeRatio, 1e-6);
+	}
+
+	@Test
+	public void testReturnize1() {
+		// Daily Value Portfolio
+		DoubleMatrix dailyValuePortfolioMx = new DoubleMatrix(new double[] {
+				1000000, 999595, 1003165, 1012630, 1011415, 1015570, 1017445,
+				1021630, 1009930, 1007230, 998035 });
+		DoubleMatrix dailyFundReturnMx = mc.returnize1(mc.cumulativeReturn(dailyValuePortfolioMx));
+
+		// Expected daily fund return
+		DoubleMatrix dailyFundReturnMxExp = new DoubleMatrix(new double[] { 0,
+				-0.0004049999999999887, 0.0035714464358065356,
+				0.0094351377888979293, -0.0011998459457056576,
+				0.0041081059703484968, 0.0018462538278993801,
+				0.0041132444505600496, -0.011452287031508468,
+				-0.0026734526155277605, -0.0091289973491656129 });
+
+		assertEquals(dailyFundReturnMxExp, dailyFundReturnMx);
+
 	}
 }

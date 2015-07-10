@@ -100,9 +100,7 @@ public class StockQuotesUtil {
 		for (int i = 1; i < stockQuotesList.size(); i++) {
 			StockQuotes q = stockQuotesList.get(i);
 			if (q.getDates().size() != rows) {
-//				throw new StockQuotesUtilException(
-//						"Stock quotes not equal in size");
-				System.out.println("s="+q.getSymbol()+",r="+q.size);
+				return null;
 			}
 		}
 

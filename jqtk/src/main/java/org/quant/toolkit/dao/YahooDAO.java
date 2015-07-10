@@ -151,7 +151,6 @@ public class YahooDAO {
 			reader.close();
 		}
 
-		System.out.println("ctr=" + ctr);
 		return stockQuotes;
 	}
 
@@ -168,7 +167,6 @@ public class YahooDAO {
 					stockQuotes = getCachedStockQuotes(map, symbol, tradingDays);
 				}
 				if (stockQuotes == null) {
-					System.out.println("NULL!");
 					stockQuotes = getStockQuotes(url, symbol, tradingDays);
 				}
 				stockQuotesList.add(stockQuotes);
@@ -289,6 +287,7 @@ public class YahooDAO {
 		SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
 		StockQuotes stockQuotes = new StockQuotes(symbol, tradingDays);
 		String absFileName = getFileName(map, symbol);
+
 		File stockQuotesCached = new File(absFileName);
 		if (!stockQuotesCached.exists()) {
 			return null;
